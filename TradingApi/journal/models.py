@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError#for validation errors that may occur
 from django.contrib.auth.models  import User
+
 # Create your models here.
 class Strategy(models.Model):
     name = models.CharField(max_length=100)
@@ -46,6 +47,7 @@ class Trade(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trades")
     pair = models.CharField(max_length=20)
+    strategy = models.ForeignKey(Strategy, on_delete=models.SET_NULL, null=True)
 
     lot_size = models.DecimalField(max_digits=5,decimal_places=2)
     direction = models.CharField(max_length=4, choices=DIRECTION_CHOICES)
@@ -77,6 +79,11 @@ class Trade(models.Model):
     def validate_pair(self):
         if self.pair.upper() not in self.CONTRACT_SIZES:
             raise ValidationError("unsupported trading pair")
+
+    def validate_lot_size(self):
+        if self.lot_size <= 0:
+            raise ValidationError("lot size must be positive")
+
     def save(self, *args, **kwargs):
         if self.pair:
             self.pair = self.pair.upper() #normalize to uppercase
