@@ -1,11 +1,26 @@
 from django.db import models
 from django.core.exceptions import ValidationError#for validation errors that may occur
+from django.contrib.auth.models  import User
 # Create your models here.
+class Strategy(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    def __str__(self):
+        return self.name
+
+class Profile(models.Model):
+    user= models.OneToOneField(User, on_delete=models.CASCADE, related_name="trades")
+    Account_size = models.DecimalField(max_digits=20, decimal_places=2)
+    current_balance = models.DecimalField(max_digits=20, decimal_places=2)
+
+    def update_balance(self, profit_loss):
+        self.current_balance += profit_loss
+        self.save()
 
 class Trade(models.Model):
     DIRECTION_CHOICES = [
-        ('BUY'), 
-        ('SELL'),]
+        ("BUY", "Buy"), 
+        ("SELL", "Sell"),] #value then display_name, lerant that the hard way
 
     CONTRACT_SIZES = {
         "XAUUSD":100,
@@ -24,6 +39,12 @@ class Trade(models.Model):
         ('CONFIDENCE', 'Confidence'),
     ]
 
+    STATUS_CHOICES = [
+        ('OPEN', 'Open'),
+        ('CLOSED', 'Closed'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trades")
     pair = models.CharField(max_length=20)
 
     lot_size = models.DecimalField(max_digits=5,decimal_places=2)
@@ -37,51 +58,39 @@ class Trade(models.Model):
 
     opened_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(null=True, blank=True)
-
+    status = models.CharField(max_length=6, choices=STATUS_CHOICES, default="OPEN")
     emotion = models.CharField(max_length=255,choices=EMOTION_CHOICES)
     #function to get contract size based on pair
     def get_contract_size(self):
-        return self.CONTRACT_SIZES.get(self.pair, 100000) #default to 100k if pair not found
+        return self.CONTRACT_SIZES.get(self.pair.upper(), 100000) #default to 100k if pair not found
 
     #FUNC to automatically calculate profit/loss when exit_price is set
     def calculate_profit_loss(self):
-        if self.exit_price is None:
+        if not self.exit_price:
             return 0
-   
-        if self.direction == 'BUY':
-            return (self.exit_price -self.entry_price)*self.lot_size*self.get_contract_size()
-        else: #SELL
-            return (self.entry_price - self.exit_price)*self.lot_size*self.get_contract_size()
-        return 0
-    # the formulae are well explained in the readme.md file of the project.
-    
+        price_diff = self.exit_price - self.entry_price
+        if self.direction == "SELL":
+            price_diff = -price_diff
+        return price_diff * self.lot_size * self.get_contract_size()
 
-    #validation to ensure the pair is supported
+    #validation, everything uppercase, Normalization concept
     def validate_pair(self):
         if self.pair.upper() not in self.CONTRACT_SIZES:
-            raise ValidationError("This trading pair is unsupported")
-    #normalisation for uniformity
-
+            raise ValidationError("unsupported trading pair")
     def save(self, *args, **kwargs):
-         if self.pair:
-            self.pair = self.pair.upper()
-        #validation, is the pair in the ones suported
-
-    self.validate_pair()
-
-    if self.exit_price:
-        self.profit_loss = self.calculate_profit_loss()
-
-    super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.direction} {self.lot_size} lots of {self.pair} at {self.entry_price}"
-
-class Strategy(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    def __str__(self):
-        return self.name
-class TraderProfile(models.Model):
-    username = models.CharField(max_length=100)
-    
+        if self.pair:
+            self.pair = self.pair.upper() #normalize to uppercase
+        self.validate_pair() #validate pair before saving
+        if self.exit_price and self.status == "CLOSED":
+            self.profit_loss = self.calculate_profit_loss() 
+            
+            try:
+                Profile = self.user.Profile
+                
+                if not Trade.objects.filter(id=self.id, status="CLOSED").exists():
+                    profile.update_balance(self.profit_loss)
+            except Exception:
+                pass
+            super().save(*args, **kwargs)
+        def __str__(self):
+            return f"{self.direction} {self.lot_size} lots of {self.pair}"
