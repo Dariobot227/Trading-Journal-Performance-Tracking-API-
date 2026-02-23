@@ -10,7 +10,7 @@ class Strategy(models.Model):
         return self.name
 
 class Profile(models.Model):
-    user= models.OneToOneField(User, on_delete=models.CASCADE, related_name="trades")
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
     Account_size = models.DecimalField(max_digits=20, decimal_places=2)
     current_balance = models.DecimalField(max_digits=20, decimal_places=2)
 
@@ -85,19 +85,32 @@ class Trade(models.Model):
             raise ValidationError("lot size must be positive")
 
     def save(self, *args, **kwargs):
+
         if self.pair:
-            self.pair = self.pair.upper() #normalize to uppercase
-        self.validate_pair() #validate pair before saving
+            self.pair = self.pair.upper()
+
+        self.validate_pair()
+        self.validate_lot_size()
+
+        # Calculate P/L when trade is closed
         if self.exit_price and self.status == "CLOSED":
-            self.profit_loss = self.calculate_profit_loss() 
-            
+
+            self.profit_loss = self.calculate_profit_loss()
+
             try:
-                Profile = self.user.Profile
-                
-                if not Trade.objects.filter(id=self.id, status="CLOSED").exists():
+                profile = self.user.profile
+
+                if not Trade.objects.filter(
+                    id=self.id,
+                    status="CLOSED"
+                ).exists():
+
                     profile.update_balance(self.profit_loss)
+
             except Exception:
                 pass
-            super().save(*args, **kwargs)
-        def __str__(self):
-            return f"{self.direction} {self.lot_size} lots of {self.pair}"
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.direction} {self.lot_size} lots of {self.pair}"
