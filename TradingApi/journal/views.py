@@ -2,7 +2,11 @@ from django.shortcuts import render
 
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import response
+from rest_framework.response import Response
+
+from django.db.models import Count, Sum
+from rest_framework.views import APIView
+
 
 from .models import Trade, Strategy
 from .serializers import TradeSerializer,StrategySerializer,RegisterSerializer
@@ -21,7 +25,7 @@ class TradeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Trade.objects.filter(user=self.request.user)
-    def perform_create(self):
+    def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     #wrapping my function with extra endpoint to get summary of trades, total number of trades and net profit/loss
@@ -30,7 +34,7 @@ class TradeViewSet(viewsets.ModelViewSet):
         trades = self.get_queryset()
 
         data = trades.aggregate(total_trades=Count('id'),Net_Profit=Sum('profit_loss'))
-        return response(data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
 
 class RegisterView(APIView):
     def post(self,request):
@@ -39,4 +43,4 @@ class RegisterView(APIView):
             user = serializer.save()
             return response({"message":"User registered successfully"}, 
             status=status.HTTP_201_CREATED)
-        return response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
