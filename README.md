@@ -45,3 +45,20 @@ This API acts as a **digital trading journal**, helping users record trades, ass
 
 ## Project Structure
 
+# profit or loss formulae
+
+For BUYS doesnt matter the pair
+Profit = (Exit Price - Entry Price) × Lot Size × Contract Size
+
+For SELLS:
+Profit = (Entry Price - Exit Price)× Lot Size × Contract Size
+
+# Contract Size Formula:
+WHAT IS CONTRACT_SIZE
+Contract Size = Market Defined Asset Unit Value
+
+Examples:
+XAUUSD = 100 ounces
+EURUSD = 100000 units
+BTCUSD = 1 contract
+
