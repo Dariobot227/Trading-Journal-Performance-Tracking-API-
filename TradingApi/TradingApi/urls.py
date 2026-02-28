@@ -15,5 +15,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/auth/', include('journal.urls')),
-    path('api/token/', obtain_auth_token),
+    path('api/login/', obtain_auth_token),
 ]
