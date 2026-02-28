@@ -1,9 +1,10 @@
 from django.db import models
-from django.core.exceptions import ValidationError#for validation errors that may occur
+from django.core.exceptions import ValidationError #for validation errors that may occur
 from django.contrib.auth.models  import User
 
 # Create your models here.
 class Strategy(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="strategies",null=True, blank=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     def __str__(self):
@@ -17,6 +18,8 @@ class Profile(models.Model):
     def update_balance(self, profit_loss):
         self.current_balance += profit_loss
         self.save()
+    def __str__(self):
+        return f"{self.user.username}'s profile"
 
 class Trade(models.Model):
     DIRECTION_CHOICES = [
