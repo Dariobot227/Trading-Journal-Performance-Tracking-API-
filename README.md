@@ -1,6 +1,6 @@
 # Trading Journal & Performance Tracking API
 
-A Django REST API serving as a digital trading journal where traders can log, manage, and analyze their activity in an isolated environment. It enables users to track strategies and emotions while generating automated performance metrics like net profit and win/loss ratios.
+A Django REST API serving as a digital trading journal where traders can log, manage, and analyze their activity in an isolated environment. It enables users to track strategies and emotions while generating automated performance metrics like net profit and total number of trades so far in that particular account.
 
 ## Features
 
@@ -14,33 +14,38 @@ A Django REST API serving as a digital trading journal where traders can log, ma
 ## API DOCUMENTATION
 HERE are the endpoints to use
 User authentication
-|Method  |         |     Endpoint  |                   |   Description                |        Auth Required|
+| Method | Endpoint            | Description         | Auth Required |
+| :----- | :------------------ | :------------------ | :-----------: |
+| POST   | /api/auth/register/ | Register a new user |       No      |
+| POST   | /api/login/         | Existing user login |       No      |
 
-|POST              | /api/auth/register/ |             | Register a new user            |     No |
-|POST              |/api/login/         |               |exiting user login              |    Yes|
 
 
 Strategy Endpoints
-POST           /api/strategies/                    Create a strategy                     Yes
-GET           /api/strategies/                     List strategies                       Yes
-PUT          /api/strategies/{id}/                 Update a strategy                     Yes
-DELETE       /api/strategies/{id}/                 Delete a strategy                     Yes
+| Method | Endpoint              | Description       | Auth Required |
+| :----- | :-------------------- | :---------------- | :-----------: |
+| POST   | /api/strategies/      | Create a strategy |      Yes      |
+| GET    | /api/strategies/      | List strategies   |      Yes      |
+| PUT    | /api/strategies/{id}/ | Update a strategy |      Yes      |
+| DELETE | /api/strategies/{id}/ | Delete a strategy |      Yes      |
+
 
 Trade Endpoints
-POST            /api/trades/                       Create a trade                        Yes
-GET           /api/trades/ –                       List user trades                      Yes
-GET           /api/trades/{id}/ –                  Retrieve a single trade               Yes
-PUT           /api/trades/{id}/ –                  Update a trade                        Yes
-DELETE        /api/trades/{id}/ –                  Delete a trade                        Yes
+| Method | Endpoint          | Description             | Auth Required |
+| :----- | :---------------- | :---------------------- | :-----------: |
+| POST   | /api/trades/      | Create a trade          |      Yes      |
+| GET    | /api/trades/      | List user trades        |      Yes      |
+| GET    | /api/trades/{id}/ | Retrieve a single trade |      Yes      |
+| PUT    | /api/trades/{id}/ | Update a trade          |      Yes      |
+| DELETE | /api/trades/{id}/ | Delete a trade          |      Yes      |
+
 
 Analytics Endpoint
-GET /api/trades/summary/ – View performance summary (total trades, net profit)
-Method,Endpoint,Description,Auth Required
-POST,/api/trades/,Create a new trade entry,✅
-GET,/api/trades/,List all user trades,✅
-GET,/api/trades/{id}/,Retrieve a single trade detail,✅
-PUT,/api/trades/{id}/,Update a trade entry,✅
-DELETE,/api/trades/{id}/,Delete a trade entry,✅
+
+| Method | Endpoint             | Description                                         | Auth Required |
+| :----- | :------------------- | :-------------------------------------------------- | :-----------: |
+| GET    | /api/trades/summary/ | View performance summary (total trades, net profit) |      Yes      |
+
 
 ## Tech Stack
 
@@ -48,6 +53,7 @@ DELETE,/api/trades/{id}/,Delete a trade entry,✅
 - **Database:** PostgreSQL (default: SQLite for development)  
 - **Environment Management:** `python-dotenv`, `.env`  
 - **Version Control:** Git + GitHub  
+
 
 
 # profit or loss formulae
