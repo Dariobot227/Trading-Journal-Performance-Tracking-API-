@@ -35,7 +35,12 @@ DELETE        /api/trades/{id}/ –                  Delete a trade             
 
 Analytics Endpoint
 GET /api/trades/summary/ – View performance summary (total trades, net profit)
-
+Method,Endpoint,Description,Auth Required
+POST,/api/trades/,Create a new trade entry,✅
+GET,/api/trades/,List all user trades,✅
+GET,/api/trades/{id}/,Retrieve a single trade detail,✅
+PUT,/api/trades/{id}/,Update a trade entry,✅
+DELETE,/api/trades/{id}/,Delete a trade entry,✅
 
 ## Tech Stack
 
