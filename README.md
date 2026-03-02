@@ -13,10 +13,11 @@ A Django REST API serving as a digital trading journal where traders can log, ma
 
 ## API DOCUMENTATION
 HERE are the endpoints to use
-Method                Endpoint                        Description                        Auth Required
 User authentication
-POST               /api/auth/register/               Register a new user                 No
-POST              /api/login/                        exiting user login                  Yes
+|Method  |         |     Endpoint  |                   |   Description                |        Auth Required|
+
+|POST              | /api/auth/register/ |             | Register a new user            |     No |
+|POST              |/api/login/         |               |exiting user login              |    Yes|
 
 
 Strategy Endpoints
